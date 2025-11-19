@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	IsAdmin(ctx context.Context, in *IsAdminRequest, opts ...grpc.CallOption) (*IsAdminResponse, error)
+	CheckPermissions(ctx context.Context, in *PermissionsRequest, opts ...grpc.CallOption) (*PermissionsResponse, error)
 }
 
 type authClient struct {
@@ -48,9 +48,9 @@ func (c *authClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.C
 	return out, nil
 }
 
-func (c *authClient) IsAdmin(ctx context.Context, in *IsAdminRequest, opts ...grpc.CallOption) (*IsAdminResponse, error) {
-	out := new(IsAdminResponse)
-	err := c.cc.Invoke(ctx, "/auth.Auth/IsAdmin", in, out, opts...)
+func (c *authClient) CheckPermissions(ctx context.Context, in *PermissionsRequest, opts ...grpc.CallOption) (*PermissionsResponse, error) {
+	out := new(PermissionsResponse)
+	err := c.cc.Invoke(ctx, "/auth.Auth/CheckPermissions", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *authClient) IsAdmin(ctx context.Context, in *IsAdminRequest, opts ...gr
 type AuthServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
-	IsAdmin(context.Context, *IsAdminRequest) (*IsAdminResponse, error)
+	CheckPermissions(context.Context, *PermissionsRequest) (*PermissionsResponse, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -77,8 +77,8 @@ func (UnimplementedAuthServer) Register(context.Context, *RegisterRequest) (*Reg
 func (UnimplementedAuthServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedAuthServer) IsAdmin(context.Context, *IsAdminRequest) (*IsAdminResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsAdmin not implemented")
+func (UnimplementedAuthServer) CheckPermissions(context.Context, *PermissionsRequest) (*PermissionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckPermissions not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -129,20 +129,20 @@ func _Auth_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_IsAdmin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IsAdminRequest)
+func _Auth_CheckPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PermissionsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServer).IsAdmin(ctx, in)
+		return srv.(AuthServer).CheckPermissions(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth.Auth/IsAdmin",
+		FullMethod: "/auth.Auth/CheckPermissions",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).IsAdmin(ctx, req.(*IsAdminRequest))
+		return srv.(AuthServer).CheckPermissions(ctx, req.(*PermissionsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -160,8 +160,8 @@ var _Auth_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Auth_Login_Handler,
 		},
 		{
-			MethodName: "IsAdmin",
-			Handler:    _Auth_IsAdmin_Handler,
+			MethodName: "CheckPermissions",
+			Handler:    _Auth_CheckPermissions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -10,7 +10,7 @@ service Auth {
 
 	rpc Login (LoginRequest) returns (LoginResponse);
 
-	rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
+	rpc CheckPermissions (PermissionsRequest) returns (PermissionsResponse);
 
 }
 
@@ -33,10 +33,10 @@ message LoginResponse {
 	string token = 1;
 }
 
-message IsAdminRequest {
+message PermissionsRequest {
 	int64 user_id = 1;
 }
 
-message IsAdminResponse {
+message PermissionsResponse {
 	bool is_admin = 1;
 }
