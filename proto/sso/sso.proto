@@ -35,8 +35,9 @@ message LoginResponse {
 
 message PermissionsRequest {
 	int64 user_id = 1;
+	int64 app_id = 2;
 }
 
 message PermissionsResponse {
-	bool is_admin = 1;
+	string permission = 1;
 }
