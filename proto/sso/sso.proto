@@ -35,10 +35,10 @@ message LoginResponse {
 }
 
 message PermissionsRequest {
-	int64 user_id = 1;
-	int64 app_id = 2;
+	int64 app_id = 1;
 }
 
 message PermissionsResponse {
 	string permission = 1;
+	string user_id = 2;
 }
