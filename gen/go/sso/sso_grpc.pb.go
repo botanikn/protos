@@ -20,6 +20,7 @@ type AuthClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	CheckPermissions(ctx context.Context, in *PermissionsRequest, opts ...grpc.CallOption) (*PermissionsResponse, error)
+	UpdatePermissions(ctx context.Context, in *UpdatePermissionsRequest, opts ...grpc.CallOption) (*UpdatePermissionsResponse, error)
 }
 
 type authClient struct {
@@ -57,6 +58,15 @@ func (c *authClient) CheckPermissions(ctx context.Context, in *PermissionsReques
 	return out, nil
 }
 
+func (c *authClient) UpdatePermissions(ctx context.Context, in *UpdatePermissionsRequest, opts ...grpc.CallOption) (*UpdatePermissionsResponse, error) {
+	out := new(UpdatePermissionsResponse)
+	err := c.cc.Invoke(ctx, "/auth.Auth/UpdatePermissions", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
@@ -64,6 +74,7 @@ type AuthServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	CheckPermissions(context.Context, *PermissionsRequest) (*PermissionsResponse, error)
+	UpdatePermissions(context.Context, *UpdatePermissionsRequest) (*UpdatePermissionsResponse, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -79,6 +90,9 @@ func (UnimplementedAuthServer) Login(context.Context, *LoginRequest) (*LoginResp
 }
 func (UnimplementedAuthServer) CheckPermissions(context.Context, *PermissionsRequest) (*PermissionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPermissions not implemented")
+}
+func (UnimplementedAuthServer) UpdatePermissions(context.Context, *UpdatePermissionsRequest) (*UpdatePermissionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePermissions not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -147,6 +161,24 @@ func _Auth_CheckPermissions_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_UpdatePermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePermissionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).UpdatePermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.Auth/UpdatePermissions",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).UpdatePermissions(ctx, req.(*UpdatePermissionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Auth_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "auth.Auth",
 	HandlerType: (*AuthServer)(nil),
@@ -162,6 +194,10 @@ var _Auth_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckPermissions",
 			Handler:    _Auth_CheckPermissions_Handler,
+		},
+		{
+			MethodName: "UpdatePermissions",
+			Handler:    _Auth_UpdatePermissions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
