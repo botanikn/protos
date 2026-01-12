@@ -19,8 +19,9 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	CheckPermissions(ctx context.Context, in *PermissionsRequest, opts ...grpc.CallOption) (*PermissionsResponse, error)
+	CheckPermissionsByJwt(ctx context.Context, in *PermissionsByJwtRequest, opts ...grpc.CallOption) (*PermissionsByJwtResponse, error)
 	UpdatePermissions(ctx context.Context, in *UpdatePermissionsRequest, opts ...grpc.CallOption) (*UpdatePermissionsResponse, error)
+	GetPermissionsByUserId(ctx context.Context, in *PermissionsByUserIdRequest, opts ...grpc.CallOption) (*PermissionsByUserIdResponse, error)
 }
 
 type authClient struct {
@@ -49,9 +50,9 @@ func (c *authClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.C
 	return out, nil
 }
 
-func (c *authClient) CheckPermissions(ctx context.Context, in *PermissionsRequest, opts ...grpc.CallOption) (*PermissionsResponse, error) {
-	out := new(PermissionsResponse)
-	err := c.cc.Invoke(ctx, "/auth.Auth/CheckPermissions", in, out, opts...)
+func (c *authClient) CheckPermissionsByJwt(ctx context.Context, in *PermissionsByJwtRequest, opts ...grpc.CallOption) (*PermissionsByJwtResponse, error) {
+	out := new(PermissionsByJwtResponse)
+	err := c.cc.Invoke(ctx, "/auth.Auth/CheckPermissionsByJwt", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,14 +68,24 @@ func (c *authClient) UpdatePermissions(ctx context.Context, in *UpdatePermission
 	return out, nil
 }
 
+func (c *authClient) GetPermissionsByUserId(ctx context.Context, in *PermissionsByUserIdRequest, opts ...grpc.CallOption) (*PermissionsByUserIdResponse, error) {
+	out := new(PermissionsByUserIdResponse)
+	err := c.cc.Invoke(ctx, "/auth.Auth/GetPermissionsByUserId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
 type AuthServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
-	CheckPermissions(context.Context, *PermissionsRequest) (*PermissionsResponse, error)
+	CheckPermissionsByJwt(context.Context, *PermissionsByJwtRequest) (*PermissionsByJwtResponse, error)
 	UpdatePermissions(context.Context, *UpdatePermissionsRequest) (*UpdatePermissionsResponse, error)
+	GetPermissionsByUserId(context.Context, *PermissionsByUserIdRequest) (*PermissionsByUserIdResponse, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -88,11 +99,14 @@ func (UnimplementedAuthServer) Register(context.Context, *RegisterRequest) (*Reg
 func (UnimplementedAuthServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedAuthServer) CheckPermissions(context.Context, *PermissionsRequest) (*PermissionsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckPermissions not implemented")
+func (UnimplementedAuthServer) CheckPermissionsByJwt(context.Context, *PermissionsByJwtRequest) (*PermissionsByJwtResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckPermissionsByJwt not implemented")
 }
 func (UnimplementedAuthServer) UpdatePermissions(context.Context, *UpdatePermissionsRequest) (*UpdatePermissionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePermissions not implemented")
+}
+func (UnimplementedAuthServer) GetPermissionsByUserId(context.Context, *PermissionsByUserIdRequest) (*PermissionsByUserIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPermissionsByUserId not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -143,20 +157,20 @@ func _Auth_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_CheckPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PermissionsRequest)
+func _Auth_CheckPermissionsByJwt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PermissionsByJwtRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServer).CheckPermissions(ctx, in)
+		return srv.(AuthServer).CheckPermissionsByJwt(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth.Auth/CheckPermissions",
+		FullMethod: "/auth.Auth/CheckPermissionsByJwt",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).CheckPermissions(ctx, req.(*PermissionsRequest))
+		return srv.(AuthServer).CheckPermissionsByJwt(ctx, req.(*PermissionsByJwtRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -179,6 +193,24 @@ func _Auth_UpdatePermissions_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_GetPermissionsByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PermissionsByUserIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).GetPermissionsByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.Auth/GetPermissionsByUserId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).GetPermissionsByUserId(ctx, req.(*PermissionsByUserIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Auth_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "auth.Auth",
 	HandlerType: (*AuthServer)(nil),
@@ -192,12 +224,16 @@ var _Auth_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Auth_Login_Handler,
 		},
 		{
-			MethodName: "CheckPermissions",
-			Handler:    _Auth_CheckPermissions_Handler,
+			MethodName: "CheckPermissionsByJwt",
+			Handler:    _Auth_CheckPermissionsByJwt_Handler,
 		},
 		{
 			MethodName: "UpdatePermissions",
 			Handler:    _Auth_UpdatePermissions_Handler,
+		},
+		{
+			MethodName: "GetPermissionsByUserId",
+			Handler:    _Auth_GetPermissionsByUserId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

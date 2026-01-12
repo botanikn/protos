@@ -10,9 +10,11 @@ service Auth {
 
 	rpc Login (LoginRequest) returns (LoginResponse);
 
-	rpc CheckPermissions (PermissionsRequest) returns (PermissionsResponse);
+	rpc CheckPermissionsByJwt (PermissionsByJwtRequest) returns (PermissionsByJwtResponse);
 
 	rpc UpdatePermissions (UpdatePermissionsRequest) returns (UpdatePermissionsResponse);
+
+	rpc GetPermissionsByUserId(PermissionsByUserIdRequest) returns (PermissionsByUserIdResponse);
 
 }
 
@@ -36,11 +38,11 @@ message LoginResponse {
 	string token = 1;
 }
 
-message PermissionsRequest {
+message PermissionsByJwtRequest {
 	int64 app_id = 1;
 }
 
-message PermissionsResponse {
+message PermissionsByJwtResponse {
 	string permission = 1;
 	int64 user_id = 2;
 }
@@ -53,4 +55,13 @@ message UpdatePermissionsRequest {
 
 message UpdatePermissionsResponse {
 	bool success = 1;
+}
+
+message PermissionsByUserIdRequest {
+	int64 app_id = 1;
+	int64 user_id = 2;
+}
+
+message PermissionsByUserIdResponse {
+	string permission = 1;
 }
