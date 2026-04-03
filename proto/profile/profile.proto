@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package profile;
+
+option go_package = "profile.profile.v1;profilev1";
+
+service Profile {
+    rpc AddProfile (AddProfileRequest) returns (AddProfileResponse);
+
+    rpc ChangeProfile (ChangeProfileRequest) returns (ChangeProfileResponse);
+
+    rpc DeleteProfile (DeleteProfileRequest) returns (DeleteProfileResponse);
+
+    rpc GetProfile (GetProfileRequest) returns (GetProfileResponse);
+}
+
+message ProfileOptions {
+    string display_name = 1;
+    string bio = 2;
+    string avatar_url = 3;
+    string settings = 4;
+    string email = 5;
+    string first_name = 6;
+    string last_name = 7;
+    string created_at = 8;
+    string updated_at = 9;
+}
+
+message AddProfileRequest {
+    repeated ProfileOptions profile_options = 1;
+}
+
+message AddProfileResponse {
+    int64 profile_id = 1;
+}
+
+message ChangeProfileRequest {
+    repeated ProfileOptions profile_options = 1;
+    int64 profile_id = 2;
+}
+
+message ChangeProfileResponse {
+    bool success = 1;
+}
+
+message DeleteProfileRequest {
+    int64 profile_id = 1;
+}
+
+message DeleteProfileResponse {
+    bool success = 1;
+}
+
+message GetProfileRequest {
+    int64 profile_id = 1;
+}
+
+message GetProfileResponse {
+    repeated ProfileOptions profile_options = 1;
+}
