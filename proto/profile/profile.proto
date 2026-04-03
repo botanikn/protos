@@ -27,7 +27,7 @@ message ProfileOptions {
 }
 
 message AddProfileRequest {
-    repeated ProfileOptions profile_options = 1;
+    ProfileOptions profile_options = 1;
 }
 
 message AddProfileResponse {
@@ -35,7 +35,7 @@ message AddProfileResponse {
 }
 
 message ChangeProfileRequest {
-    repeated ProfileOptions profile_options = 1;
+    ProfileOptions profile_options = 1;
     int64 profile_id = 2;
 }
 
@@ -56,5 +56,5 @@ message GetProfileRequest {
 }
 
 message GetProfileResponse {
-    repeated ProfileOptions profile_options = 1;
+    ProfileOptions profile_options = 1;
 }
