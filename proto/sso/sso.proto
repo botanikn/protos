@@ -16,6 +16,8 @@ service Auth {
 
 	rpc GetPermissionsByUserId(PermissionsByUserIdRequest) returns (PermissionsByUserIdResponse);
 
+	rpc CreateApp(CreateAppRequest) returns (CreateAppResponse);
+
 }
 
 message RegisterRequest {
@@ -64,4 +66,14 @@ message PermissionsByUserIdRequest {
 
 message PermissionsByUserIdResponse {
 	string permission = 1;
+}
+
+message CreateAppRequest {
+	string app_name = 1;
+	string admin_mail = 2;
+	string admin_pass = 3;
+}
+
+message CreateAppResponse {
+	int64 app_id = 1;
 }

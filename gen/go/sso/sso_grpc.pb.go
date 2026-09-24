@@ -22,6 +22,7 @@ type AuthClient interface {
 	CheckPermissionsByJwt(ctx context.Context, in *PermissionsByJwtRequest, opts ...grpc.CallOption) (*PermissionsByJwtResponse, error)
 	UpdatePermissions(ctx context.Context, in *UpdatePermissionsRequest, opts ...grpc.CallOption) (*UpdatePermissionsResponse, error)
 	GetPermissionsByUserId(ctx context.Context, in *PermissionsByUserIdRequest, opts ...grpc.CallOption) (*PermissionsByUserIdResponse, error)
+	CreateApp(ctx context.Context, in *CreateAppRequest, opts ...grpc.CallOption) (*CreateAppResponse, error)
 }
 
 type authClient struct {
@@ -77,6 +78,15 @@ func (c *authClient) GetPermissionsByUserId(ctx context.Context, in *Permissions
 	return out, nil
 }
 
+func (c *authClient) CreateApp(ctx context.Context, in *CreateAppRequest, opts ...grpc.CallOption) (*CreateAppResponse, error) {
+	out := new(CreateAppResponse)
+	err := c.cc.Invoke(ctx, "/auth.Auth/CreateApp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
@@ -86,6 +96,7 @@ type AuthServer interface {
 	CheckPermissionsByJwt(context.Context, *PermissionsByJwtRequest) (*PermissionsByJwtResponse, error)
 	UpdatePermissions(context.Context, *UpdatePermissionsRequest) (*UpdatePermissionsResponse, error)
 	GetPermissionsByUserId(context.Context, *PermissionsByUserIdRequest) (*PermissionsByUserIdResponse, error)
+	CreateApp(context.Context, *CreateAppRequest) (*CreateAppResponse, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -107,6 +118,9 @@ func (UnimplementedAuthServer) UpdatePermissions(context.Context, *UpdatePermiss
 }
 func (UnimplementedAuthServer) GetPermissionsByUserId(context.Context, *PermissionsByUserIdRequest) (*PermissionsByUserIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPermissionsByUserId not implemented")
+}
+func (UnimplementedAuthServer) CreateApp(context.Context, *CreateAppRequest) (*CreateAppResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateApp not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -211,6 +225,24 @@ func _Auth_GetPermissionsByUserId_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_CreateApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAppRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).CreateApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.Auth/CreateApp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).CreateApp(ctx, req.(*CreateAppRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Auth_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "auth.Auth",
 	HandlerType: (*AuthServer)(nil),
@@ -234,6 +266,10 @@ var _Auth_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPermissionsByUserId",
 			Handler:    _Auth_GetPermissionsByUserId_Handler,
+		},
+		{
+			MethodName: "CreateApp",
+			Handler:    _Auth_CreateApp_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
